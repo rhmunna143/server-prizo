@@ -31,12 +31,11 @@ db.once('open', () => {
 
 // Define a Mongoose Schema
 const userSchema = new mongoose.Schema({
-    DisplayName: String,
+    displayName: String,
     email: String,
     uid: String,
     photoURL: String,
-    role: String,
-    password: String,
+    role: String
 });
 
 const User = mongoose.model("User", userSchema);
@@ -110,6 +109,42 @@ app.get("/users/:uid", async (req, res) => {
         res.status(200).send(user);
     } catch (err) {
         res.status(500).send(err);
+    }
+})
+
+// delete user
+app.delete("/users/delete/:uid", async (req, res) => {
+    try {
+        const uid = req.params.uid;
+        console.log(uid);
+        const deletedUser = await User.findOneAndDelete({ uid: uid });
+
+        res.status(204).send(deletedUser);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+// update user role
+app.patch("/users/update/:uid", async (req, res) => {
+    try {
+        const uid = req.params.uid;
+
+        const updateData = req.body;
+
+        const updated = await User.findOneAndUpdate(
+            { uid: uid },
+            { $set: updateData },
+            { new: true }
+        );
+
+        if (!updated) {
+            return res.status(404).send({ success: false, message: "Not Found" })
+        }
+
+        res.status(200).send(updated);
+    } catch (error) {
+        res.status(500).send(error);
     }
 })
 
