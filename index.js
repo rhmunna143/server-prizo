@@ -105,6 +105,7 @@ app.get("/users", async (req, res) => {
 app.get("/users/:uid", async (req, res) => {
     try {
         const uid = req.params.uid;
+
         const user = await User.findOne({ uid: uid });
         res.status(200).send(user);
     } catch (err) {
@@ -150,6 +151,19 @@ app.get("/contest", async (req, res) => {
         const contests = await Contest.find({ creatorUid: uid });
 
         res.status(200).send(contests);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+// top contests
+app.get("/contests/top", async (req, res) => {
+    try {
+        const topContests = await Contest.find({ participants: { $gte: 0 } })
+            .sort({ participants: -1 })
+            .limit(8)
+
+        res.status(200).send(topContests);
     } catch (error) {
         res.status(500).send(error);
     }
