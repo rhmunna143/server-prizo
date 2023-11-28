@@ -16,7 +16,9 @@ app.use(cors({
 app.use(express.json())
 
 // uri
-const uri = process.env.URI;
+// const uri = process.env.URI;
+
+const uri = process.env.LOCAL_URI;
 
 // mongoose db connect
 mongoose.connect(uri)
@@ -161,6 +163,25 @@ app.get("/contests/:id", async (req, res) => {
         const contest = await Contest.findById(id);
 
         res.status(200).send(contest);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+// patch contest
+app.patch("/contest", async (req, res) => {
+    try {
+        const id = req.query.id;
+        const updateContest = req.body;
+
+        const updatedContest = await Contest.findByIdAndUpdate(id, updateContest, { new: true })
+
+        if (!updatedContest) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json(updatedContest);
+
     } catch (error) {
         res.status(500).send(error);
     }

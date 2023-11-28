@@ -105,17 +105,6 @@ app.delete('/users/:userId', async (req, res) => {
 });
 
 
-// Update a user by ID (PATCH)
-app.patch('/users/:userId', (req, res) => {
-  User.findByIdAndUpdate(req.params.userId, req.body, { new: true }, (err, user) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.status(200).send(user);
-    }
-  });
-});
-
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
