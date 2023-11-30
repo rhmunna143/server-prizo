@@ -120,6 +120,23 @@ app.post("/create-charge", async (req, res) => {
     }
 })
 
+// registered
+app.patch("/registered", async (req, res) => {
+    const id = req.query.id;
+    const update = req.body;
+
+    const newUpdate = await Payment.findOneAndUpdate(
+        { contestId: id },
+        { $set: update },
+        { new: true }
+    )
+
+    res.status(200).send(newUpdate)
+})
+
+//get paid contest
+
+
 
 
 // users
