@@ -76,6 +76,7 @@ const paymentSchema = new mongoose.Schema({
     contestName: String,
     image: String,
     task: String,
+    email: String
 })
 
 const Payment = mongoose.model("Payment", paymentSchema);
@@ -120,7 +121,7 @@ app.post("/create-charge", async (req, res) => {
     }
 })
 
-// registered
+// registered submit tasks
 app.patch("/registered", async (req, res) => {
     const id = req.query.id;
     const update = req.body;
@@ -135,7 +136,11 @@ app.patch("/registered", async (req, res) => {
 })
 
 //get paid contests
+app.get("/submitted", async (req, res) => {
+    const submitted = await Payment.find({})
 
+    res.status(200).send(submitted);
+})
 
 
 
@@ -188,7 +193,7 @@ app.get("/users/:uid", async (req, res) => {
 app.delete("/users/delete/:uid", async (req, res) => {
     try {
         const uid = req.params.uid;
-        console.log(uid);
+
         const deletedUser = await User.findOneAndDelete({ uid: uid });
 
         res.status(204).send(deletedUser);
@@ -248,6 +253,21 @@ app.get("/contests", async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
+})
+
+// accepted contests
+app.patch("/contest/update/accept", async (req, res) => {
+    const id = req.query.id;
+
+    const update = req.body;
+
+    const newUpdate = await Contest.findByIdAndUpdate(
+        id,
+        { $set: update },
+        { new: true }
+    )
+
+    res.status(200).send(newUpdate);
 })
 
 // search contests
@@ -322,11 +342,11 @@ app.patch("/contest", async (req, res) => {
 })
 
 // get single contest and delete
-app.delete("/contests/delete/:id", async (req, res) => {
+app.delete("/contests/delete", async (req, res) => {
     try {
-        const id = req?.params?.id;
+        const id = req?.query?.id;
 
-        const contest = await Contest.findByIdAndDelete({ _id: id })
+        const contest = await Contest.findByIdAndDelete(id)
 
         res.status(200).send(contest);
     } catch (error) {
