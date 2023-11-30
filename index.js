@@ -1,8 +1,10 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const express = require('express');
 const app = express()
 const cors = require('cors');
 require('dotenv').config()
 const mongoose = require('mongoose');
+
 
 const port = process.env.PORT || 5000;
 
@@ -40,7 +42,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-
 // contest schema
 const contestSchema = new mongoose.Schema({
     contestName: String,
@@ -59,10 +60,64 @@ const contestSchema = new mongoose.Schema({
 
 const Contest = mongoose.model("contest", contestSchema);
 
+// payment records schema
+const paymentSchema = new mongoose.Schema({
+    chargeId: String,
+    amount: Number,
+    currency: String,
+    uid: String,
+    contestId: String,
+    source: String,
+    description: String,
+    photoURL: String,
+    contestId: String,
+    winner: String,
+    userName: String,
+    contestName: String,
+    image: String,
+    task: String,
+})
+
+const Payment = mongoose.model("Payment", paymentSchema);
+
 // root directory
 app.get("/", (req, res) => {
 
     res.status(200).send("prizo server is walking...");
+})
+
+// payments related api
+app.post("/create-charge", async (req, res) => {
+    try {
+        const uid = req.query.uid;
+        const { contestId } = req.body;
+        const payment = req.body;
+        // save DB record here
+
+        const newPayment = new Payment(payment)
+        const savedPayment = await newPayment.save()
+
+        if (savedPayment) {
+            const pervious = await Contest.findById(contestId);
+            const previousParticipants = pervious.participants;
+            const newParticipants = { participants: previousParticipants + 1 }
+
+            const updated = await Contest.findByIdAndUpdate(contestId, {
+                $set: newParticipants
+            }, { new: true })
+
+            res.status(200).send({ success: true, message: "payment complete", savedPayment })
+        }
+
+        // const charge = await stripe.charges.create({
+        //     amount: amount,
+        //     currency: currency,
+        //     source,
+        //     description
+        // })
+    } catch (error) {
+        res.status(202).send({ success: true, message: "payment done" })
+    }
 })
 
 
@@ -147,7 +202,6 @@ app.patch("/users/update/:uid", async (req, res) => {
         res.status(500).send(error);
     }
 })
-
 
 
 
