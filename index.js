@@ -20,9 +20,9 @@ app.use(cors({
 app.use(express.json())
 
 // uri
-// const uri = process.env.URI;
+const uri = process.env.URI;
 
-const uri = process.env.LOCAL_URI;
+// const uri = process.env.LOCAL_URI;
 
 // mongoose db connect
 mongoose.connect(uri)
