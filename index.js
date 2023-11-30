@@ -11,6 +11,8 @@ const port = process.env.PORT || 5000;
 // middleman
 app.use(cors({
     origin: [
+        process.env.LIVE,
+        process.env.SECOND_LIVE,
         process.env.LOCAL
     ],
     credentials: true,
@@ -55,7 +57,8 @@ const contestSchema = new mongoose.Schema({
     creatorUid: String,
     participants: Number,
     status: String,
-    tag: String
+    tag: String,
+    creatorPhotoUrl: String
 })
 
 const Contest = mongoose.model("contest", contestSchema);
@@ -76,7 +79,9 @@ const paymentSchema = new mongoose.Schema({
     contestName: String,
     image: String,
     task: String,
-    email: String
+    email: String,
+    creatorId: String,
+    deadline: String
 })
 
 const Payment = mongoose.model("Payment", paymentSchema);
