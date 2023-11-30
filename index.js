@@ -134,7 +134,7 @@ app.patch("/registered", async (req, res) => {
     res.status(200).send(newUpdate)
 })
 
-//get paid contest
+//get paid contests
 
 
 
@@ -248,6 +248,20 @@ app.get("/contests", async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
+})
+
+// search contests
+app.get("/search", async (req, res) => {
+    const tag = req.query.tag;
+
+    const contests = await Contest.find({
+        tag: {
+            $regex: new RegExp(tag, "i")
+        }
+    })
+
+    res.status(200).send(contests);
+
 })
 
 // get creator contests
